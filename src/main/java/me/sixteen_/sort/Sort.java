@@ -17,7 +17,9 @@ import net.minecraft.client.gui.screen.ingame.HopperScreen;
 import net.minecraft.client.gui.screen.ingame.ScreenHandlerProvider;
 import net.minecraft.client.gui.screen.ingame.ShulkerBoxScreen;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.util.collection.DefaultedList;
 
 public class Sort implements ISort, ClientModInitializer {
 
@@ -73,47 +75,26 @@ public class Sort implements ISort, ClientModInitializer {
 	}
 
 	private void sort() {
-		Integer[] slots = getContainerSlots();
-		quicksort(slots, 0, slots.length - 1);
-
-		// hacky way to ensure multiple stacks get fused
-		for (int i = 0; i <= 20; i++) {
-			combine(getContainerSlots());
-		}
-
-		slots = getContainerSlots();
-		quicksort(slots, 0, slots.length - 1);
+		DefaultedList<Slot> slots = container.slots;
+		quicksort(slots, 0, slots.size() - 1);
 	}
 
-	private void combine(Integer[] slots) {
-		System.out.println("\n\n\nCombining...\n\n\n");
-		for (int slot = slots.length - 1; slot > 0; slot--) {
-			System.out.println("slot: " + slot + ", ID: " + slots[slot]);
-			if (slots[slot - 1].equals(slots[slot])) {
-				System.out.println("clickt");
-				pickup(slot);
-				pickup(slot - 1);
-				pickup(slot);
-			}
-		}
-	}
-
-	private void quicksort(Integer[] slots, int left, int right) {
+	private void quicksort(DefaultedList<Slot> slots, int left, int right) {
 		if (left >= right || left < 0) {
 			return;
 		}
 		int p = partition(slots, left, right);
-		quicksort(getContainerSlots(), left, p - 1);
-		quicksort(getContainerSlots(), p + 1, right);
+		quicksort(slots, left, p - 1);
+		quicksort(slots, p + 1, right);
 	}
 
-	private int partition(Integer[] slots, int left, int right) {
-		int pivot = slots[right];
+	private int partition(DefaultedList<Slot> slots, int left, int right) {
+		Slot pivot = slots.get(right);
 		int i = left - 1;
 
 		for (int j = left; j < right; j++) {
-			int id = slots[j];
-			if (id <= pivot) {
+			Slot id = slots.get(j);
+			if (order.compare(id, pivot) <= 0) {
 				i++;
 				swap(i, j);
 			}
@@ -121,13 +102,6 @@ public class Sort implements ISort, ClientModInitializer {
 		i++;
 		swap(i, right);
 		return i;
-	}
-
-	private Integer[] getContainerSlots() {
-		return container.slots.stream()//
-				.filter(slot -> !mc.player.getInventory().equals(slot.inventory))//
-				.map(order::getOrder)//
-				.toArray(Integer[]::new);
 	}
 
 	private void swap(int i1, int i2) {

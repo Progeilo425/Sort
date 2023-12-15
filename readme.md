@@ -4,4 +4,5 @@
 ## TODO
 - [ ] inventory sorting
 - [ ] [cycle sort](https://en.wikipedia.org/wiki/Cycle_sort) algorithm
-- [ ] better interface for sort extension
+- [ ] stacking
+- [x] better interface for sort extension

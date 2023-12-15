@@ -1,22 +1,21 @@
 package me.sixteen_.sort.api;
 
+import java.util.Comparator;
+
 import net.minecraft.item.Item;
 import net.minecraft.screen.slot.Slot;
 
 @FunctionalInterface
-public interface IOrder {
-
-	/**
-	 * @return order by integer from low to high
-	 */
-	int getOrder(Slot slot);
+public interface IOrder extends Comparator<Slot> {
 
 	/**
 	 * @return order by item id
 	 */
-	static int defaultOrder(Slot slot) {
-		// since the list is sorted from low to high, the empty slot always
-		// gets assigned the highest possible value
-		return slot.getStack().isEmpty() ? Integer.MAX_VALUE : Item.getRawId(slot.getStack().getItem());
+	static int defaultOrder(Slot slot1, Slot slot2) {
+		int id1 = Item.getRawId(slot1.getStack().getItem());
+		int id2 = Item.getRawId(slot2.getStack().getItem());
+		id1 = id1 == 0 ? Integer.MAX_VALUE : id1;
+		id2 = id2 == 0 ? Integer.MAX_VALUE : id2;
+		return Integer.compare(id1, id2);
 	}
 }
