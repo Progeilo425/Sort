@@ -68,15 +68,15 @@ public class Sort implements ISort, ClientModInitializer {
 	}
 
 	private boolean isContainer(Screen screen) {
-		return screen instanceof GenericContainerScreen || //
-				screen instanceof ShulkerBoxScreen || //
-				screen instanceof Generic3x3ContainerScreen || //
+		return screen instanceof GenericContainerScreen ||
+				screen instanceof ShulkerBoxScreen ||
+				screen instanceof Generic3x3ContainerScreen ||
 				screen instanceof HopperScreen;
 	}
 
 	private void sort() {
 		DefaultedList<Slot> slots = container.slots;
-		quicksort(slots, 0, slots.size() - 1);
+		quicksort(slots, 0, slots.size() - (mc.player.getInventory().size() - 5) - 1);
 	}
 
 	private void quicksort(DefaultedList<Slot> slots, int left, int right) {
