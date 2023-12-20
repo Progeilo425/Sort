@@ -6,4 +6,4 @@
 - [ ] [cycle sort](https://en.wikipedia.org/wiki/Cycle_sort) algorithm
 - [ ] stacking
 - [ ] interface
-	- [ ] adjustable sorting speed
+	- [x] adjustable sorting speed
