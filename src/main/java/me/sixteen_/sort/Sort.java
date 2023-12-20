@@ -1,6 +1,7 @@
 package me.sixteen_.sort;
 
 import me.sixteen_.sort.api.IConfig;
+import me.sixteen_.sort.api.IDelay;
 import me.sixteen_.sort.api.IOrder;
 import me.sixteen_.sort.api.ISort;
 import me.sixteen_.sort.api.SortClientModInitializer;
@@ -25,6 +26,7 @@ public class Sort implements ISort, ClientModInitializer {
 
 	private IConfig config;
 	private IOrder order;
+	private IDelay delay;
 
 	private MinecraftClient mc;
 	private ScreenHandler container;
@@ -33,6 +35,7 @@ public class Sort implements ISort, ClientModInitializer {
 	public void onInitializeClient() {
 		setConfig(IConfig::defaultConfig);
 		setOrder(IOrder::defaultOrder);
+		setDelay(IDelay::defaultDelay);
 
 		FabricLoader.getInstance()
 				.getEntrypointContainers("sort", SortClientModInitializer.class)
@@ -58,12 +61,18 @@ public class Sort implements ISort, ClientModInitializer {
 		this.order = order;
 	}
 
+	@Override
+	public void setDelay(IDelay delay) {
+		this.delay = delay;
+	}
+
 	private void screenKeyEvent(MinecraftClient client, Screen containerScreen, int keycode) {
 		if (keycode == config.getKeycode()) {
 			mc = client;
 			ScreenHandler container = ((ScreenHandlerProvider<?>) containerScreen).getScreenHandler();
 			this.container = container;
-			sort();
+			Thread sortThread = new Thread(this::sort, "sort");
+			sortThread.start();
 		}
 	}
 
@@ -105,10 +114,15 @@ public class Sort implements ISort, ClientModInitializer {
 	}
 
 	private void swap(int i1, int i2) {
-		if (i1 != i2) {
-			pickup(i1);
-			pickup(i2);
-			pickup(i1);
+		try {
+			Thread.sleep(delay.getDelay());
+		} catch (Exception e) {
+		} finally {
+			if (i1 != i2) {
+				pickup(i1);
+				pickup(i2);
+				pickup(i1);
+			}
 		}
 	}
 
